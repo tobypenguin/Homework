@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - "./datamongo:/data/db"
+    ports:
+      - 27017:27017
+  rabbitmq3:
+        container_name: "rabbitmq"
+        image: rabbitmq:3.9-management
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+        ports:
+            # AMQP protocol port
+            - '5672:5672'
+            # HTTP management UI
+            - '15672:15672'
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - cache:/data
+volumes:
+  cache:
+    driver: local
