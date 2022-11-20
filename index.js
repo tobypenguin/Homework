@@ -9,7 +9,7 @@ let totalPages = [];
 let i = 0;
 
 let params = {
-  key: "AIzaSyCuvdW20d-RmXR1frQViK4-4UVkG435bdY",
+  key: "AIzaSyAhKJtJOHcf33oxRH1QgU1-Eu7xSD2X9A0",
   part: "snippet",
   chart: "mostPopular",
   regionCode: "TH",
@@ -51,41 +51,44 @@ async function get_channelId() {
     });
     i++;
   }
-  console.log(channel_id);
+  // console.log(channel_id);
   console.log("get channel id end");
   console.log("************************");
+  return channel_id;
 }
 
-async function check_sub() {
+async function check_sub(channel_id) {
   console.log("start checking sub");
   console.log("************************");
 
   // forEach id and then get api 
 
-  channel_id.forEach(async element => {
+  for (let i = 0; i < channel_id.length; i++) {
+    // console.log(channel_id[i]);
     await axios.get('https://www.googleapis.com/youtube/v3/channels', {
       params: {
-        key: "AIzaSyCuvdW20d-RmXR1frQViK4-4UVkG435bdY",
+        key: "AIzaSyAhKJtJOHcf33oxRH1QgU1-Eu7xSD2X9A0",
         part: "snippet,statistics",
-        id: element
+        id: channel_id[i]
       }
     }).then(res => {
       dataCH.push(
         {
-          Channel_id: element,
+          Channel_id: channel_id[i],
           Channel_name: res.data.items[0].snippet.title,
           Sub_count: !res.data.items[0].statistics.hiddenSubscriberCount ? res.data.items[0].statistics.subscriberCount : 0
-        })
+        });
     });
-    console.log(dataCH);
-  })
-  
+    // console.log(JSON.stringify(dataCH));
+  }
+  return dataCH;
 }
 
-function Steps() {
-  Promise.resolve(get_channelId()).then(x => {
-    return check_sub();
-  })
-}
 
-Steps();
+export async function Steps() {
+  let channel = await get_channelId(channel_id);
+  // console.log(channel);
+  let verify = await check_sub(channel);
+  console.log(verify);
+  return verify;
+}
